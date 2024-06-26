@@ -1,6 +1,7 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
+const serverless = require('serverless-http');
+const mongoose = require('mongoose');
 
 // Routes Import
 const GetProductRouter = require('../routes/products/getProductsRoute');
@@ -12,7 +13,8 @@ const SignUpRouter = require('../routes/signupRoute');
 const LoginRouter = require('../routes/loginRoute');
 
 require('dotenv').config();
-const mongoose = require('mongoose');
+
+const app = express();
 app.use(express.json());
 app.use(cors());
 
@@ -25,12 +27,23 @@ app.use('/fossaAPI/deleteProduct', DeleteProductRouter);
 app.use('/fossaAPI/user', SignUpRouter);
 app.use('/fossaAPI/auth', LoginRouter);
 
-mongoose.connect(process.env.MONGO_URI)
-.then((response) => {
-    app.listen(process.env.PORT, () => {
-        console.log('Database connected successfully!');
-    });
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+    console.log('Database connected successfully!');
 })
 .catch((error) => {
-    console.log(error);
+    console.error('Error connecting to database:', error);
 });
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Internal Server Error');
+});
+
+module.exports = app;
+module.exports.handler = serverless(app);
