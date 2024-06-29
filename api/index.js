@@ -27,11 +27,12 @@ app.use('/fossaAPI/user', SignUpRouter);
 app.use('/fossaAPI/auth', LoginRouter);
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-.then(() => {
-    console.log('Database connected successfully!');
-})
-.catch((error) => {
-    console.error('Error connecting to database:', error);
+mongoose.connect(process.env.MONGO_URI).then((res)=>{
+    app.listen(process.env.PORT,()=>{
+        console.log("Database connected successfully & server is listen on 5000...");
 });
+
+}).catch((err)=>{
+console.log(err);
+})
 
