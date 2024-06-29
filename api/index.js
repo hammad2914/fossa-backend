@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const serverless = require('serverless-http');
 const mongoose = require('mongoose');
 
 // Routes Import
@@ -28,10 +27,7 @@ app.use('/fossaAPI/user', SignUpRouter);
 app.use('/fossaAPI/auth', LoginRouter);
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGO_URI)
 .then(() => {
     console.log('Database connected successfully!');
 })
@@ -39,11 +35,3 @@ mongoose.connect(process.env.MONGO_URI, {
     console.error('Error connecting to database:', error);
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Internal Server Error');
-});
-
-module.exports = app;
-module.exports.handler = serverless(app);
